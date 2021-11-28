@@ -11,6 +11,11 @@ class Settings(BaseSettings):
     # redis
     REDIS_URL: str = "redis://localhost/0"
 
+    # mongodb
+    MONGO_URL: str = "mongodb://localhost"
+    MONGO_PORT: int = 27017
+    MONGO_DB_NAME: str = "stadium_ticket"
+
     # to get a string like this run:
     # openssl rand -hex 32
     SECRET_KEY = "69208e7f89038df97ff9af4eb3e894e0e0f5515206b86fb58268f0b6b434d5d8"
@@ -21,3 +26,5 @@ class Settings(BaseSettings):
 @lru_cache()
 def get_settings():
     return Settings()
+
+from data.connections.mongodb import db_conn

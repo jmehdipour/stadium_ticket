@@ -9,7 +9,7 @@ app = FastAPI(title=get_settings().APP_NAME)
 app.include_router(api_router_v1_0, prefix='/api_v1.0')
 app.include_router(api_router_general, prefix='/general')
 
-if get_settings().debug:
+if get_settings().DEBUG:
     if __name__ == "__main__":
         import uvicorn
 
