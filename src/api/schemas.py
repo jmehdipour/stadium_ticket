@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import List
 
@@ -31,3 +32,11 @@ class StadiumIn(BaseModel):
     city: str
     sales_participation: float
     seat_categories: List[SeatCategory] = []
+
+
+class MatchIn(BaseModel):
+    host_team: str
+    guest_team: str
+    stadium_id: int
+    starts_at: datetime
+    ends_at: datetime

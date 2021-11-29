@@ -26,3 +26,14 @@ class Stadium(Document):
     sales_participation = FloatField(required=True)
     created_at = DateTimeField(auto_now_add=True)
     updated_at = DateTimeField(auto_now_add=True)
+
+
+class Match(Document):
+    id = LongField(primary_key=True)
+    host_team = StringField(max_length=100)
+    guest_team = StringField(max_length=100)
+    stadium_id: LongField()
+    starts_at = DateTimeField()
+    ends_at = DateTimeField()
+    created_at = DateTimeField(auto_now_add=True)
+    updated_at = DateTimeField(auto_now_add=True)
