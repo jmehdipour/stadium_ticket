@@ -26,8 +26,7 @@ async def sign_up_new_user(user_data: UserIn):
         mongo_user = User(
             id=counter('user'),
             **user_data.dict(exclude={'password'}),
-            hashed_password=get_password_hash(user_data.password),
-            type=1002
+            hashed_password=get_password_hash(user_data.password)
         )
         mongo_user.save()
     except NotUniqueError as ex:
