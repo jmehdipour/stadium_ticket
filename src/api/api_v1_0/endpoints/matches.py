@@ -9,8 +9,8 @@ from src.data.models.mongodb import Match, Stadium
 router = APIRouter()
 
 
-@router.get('stadiums')
-def get_all_stadiums(size: int = 10, last_id: int = None, first_id: int = None):
+@router.get('/matches')
+def get_all_matches(size: int = 10, last_id: int = None, first_id: int = None):
     if first_id and not last_id:
         matches = Match.objects(id__gt=first_id)
     elif not first_id and last_id:
@@ -22,9 +22,9 @@ def get_all_stadiums(size: int = 10, last_id: int = None, first_id: int = None):
     return match_dict_list
 
 
-@router.post('matches', dependencies=[Depends(is_admin)])
+@router.post('/matches', dependencies=[Depends(is_admin)])
 def create_match(match_data: MatchIn):
-    stadium = Stadium.objects(id=match_data.stadium_id).get()
+    stadium = Stadium.objects(id=match_data.stadium_id).first()
     if not stadium:
         raise HTTPException(
             status_code=422,
@@ -50,5 +50,17 @@ def create_match(match_data: MatchIn):
 
 @router.get('/matches/{match_id}')
 async def get_match(match_id: int):
-    match = Match.objects(id=match_id).get()
+    match = Match.objects(id=match_id).first()
+    if not match:
+        raise HTTPException(status_code=404, detail="match not found")
     return match.to_mongo()
+
+
+@router.delete('/matches/{match_id}', dependencies=[Depends(is_admin)])
+async def delete_match(match_id: int):
+    match = Match.objects(id=match_id).first()
+    if match:
+        match.delete()
+    else:
+        raise HTTPException(status_code=404, detail="match not found")
+    return {"result": True}

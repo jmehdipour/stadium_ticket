@@ -23,8 +23,12 @@ async def read_users_me(current_user: User = Depends(get_current_user)):
 @router.post("/auth/sign_up", response_model=UserOut)
 async def sign_up_new_user(user_data: UserIn):
     try:
-        mongo_user = User(id=counter('user'), **user_data.dict(exclude={'password'}),
-                          hashed_password=get_password_hash(user_data.password))
+        mongo_user = User(
+            id=counter('user'),
+            **user_data.dict(exclude={'password'}),
+            hashed_password=get_password_hash(user_data.password),
+            type=1002
+        )
         mongo_user.save()
     except NotUniqueError as ex:
         raise HTTPException(status_code=409, detail="duplicate email address")

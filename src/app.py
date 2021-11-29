@@ -13,4 +13,4 @@ if get_settings().DEBUG:
     if __name__ == "__main__":
         import uvicorn
 
-        uvicorn.run(app, host="127.0.0.1", port=9000, debug=True)
+        uvicorn.run(app, host="127.0.0.1", port=9900, debug=True)

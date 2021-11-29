@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from mongoengine import NotUniqueError
 
+from src.api.middlewares import is_admin
 from src.api.schemas import StadiumIn
 from src.data.connections.mongodb import counter
 from src.data.models.mongodb import Stadium
@@ -8,7 +9,7 @@ from src.data.models.mongodb import Stadium
 router = APIRouter()
 
 
-@router.get('stadiums')
+@router.get('/stadiums')
 def get_all_stadiums(size: int = 10, last_id: int = None, first_id: int = None):
     if first_id and not last_id:
         stadiums = Stadium.objects(id__gt=first_id)
@@ -21,7 +22,7 @@ def get_all_stadiums(size: int = 10, last_id: int = None, first_id: int = None):
     return stadium_dict_list
 
 
-@router.post('stadiums')
+@router.post('/stadiums', dependencies=[Depends(is_admin)])
 def create_stadium(stadium_data: StadiumIn):
     try:
         mongo_stadium = Stadium(id=counter('stadium'), **stadium_data.dict())
@@ -33,7 +34,7 @@ def create_stadium(stadium_data: StadiumIn):
     return mongo_stadium.to_mongo()
 
 
-@router.put('stadiums/{stadium_id}')
+@router.put('/stadiums/{stadium_id}', dependencies=[Depends(is_admin)])
 def update_stadium(stadium_id: int, stadium_data: StadiumIn):
     try:
         Stadium.objects(id=stadium_id).update(**stadium_data.dict())
@@ -42,18 +43,20 @@ def update_stadium(stadium_id: int, stadium_data: StadiumIn):
     return {'result': True}
 
 
-@router.delete('stadiums/{stadium_id}')
+@router.delete('/stadiums/{stadium_id}')
 def delete_stadium(stadium_id: int):
-    try:
-        Stadium.objects(id=stadium_id).delete()
-    except Exception as ex:
-        raise HTTPException(status_code=500, detail="internal server error")
+
+    stadium = Stadium.objects(id=stadium_id).first()
+    if stadium:
+        stadium.delete()
+    else:
+        raise HTTPException(status_code=404, detail="stadium not found")
     return {'result': True}
 
 
-@router.get('stadiums/{stadium_id}')
+@router.get('/stadiums/{stadium_id}')
 def show_stadium(stadium_id: int):
-    stadium = Stadium.objects(id=stadium_id).get()
+    stadium = Stadium.objects(id=stadium_id).first()
     if not stadium:
         raise HTTPException(status_code=404, detail=f"there is no stadium with id : {stadium_id}")
     return stadium.to_mongo()

@@ -24,7 +24,7 @@ def get_password_hash(password):
 
 
 def authenticate_user(email: str, password: str):
-    user = User.objects(email=email).get()
+    user = User.objects(email=email).first()
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -57,7 +57,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         token_data = TokenData(email=email)
     except JWTError:
         raise credentials_exception
-    user = User.objects(email=token_data.email).get()
+    user = User.objects(email=token_data.email).first()
     if user is None:
         raise credentials_exception
     return user
